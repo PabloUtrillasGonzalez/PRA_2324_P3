@@ -32,9 +32,7 @@ class TableEntry {
 		return (te1.key != te2.key);
 	}
 	friend ostream&operator<<(ostream &out, const TableEntry<V> &te){
-		out = "Par clave: " + te.key + " valor " + te.value + "\n";
-		
-		return out;
+		return out << "('" << te.key << "' => " << te.value << ")";
 	}
 
 
