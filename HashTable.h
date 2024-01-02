@@ -30,7 +30,7 @@ class HashTable: public Dict<V> {
     public:
 	HashTable(int size){
 		table = new ListLinked<TableEntry<V>>[size];
-		n = size;
+		n = 0;
 		max = size;
 	}
 
@@ -38,25 +38,76 @@ class HashTable: public Dict<V> {
 		delete[] table;
 	}
 
-	int capacity(){
+	int capacity() const{
 		return max;
 	}
 
 	friend ostream&operator<<(ostream &out,const HashTable<V> &th){
-		for(auto a : th){
-			out << a << endl;
+		out << "HashTable [entries: " << th.entries() << ", capacity: "<< th.capacity() <<"]" << endl;
+		
+		out << "==============" << endl << endl;
+		for(int i = 0;i < th.max;i++){
+
+			out << "== Cubeta "<< i << " ==" << endl << endl << th.table[i] << endl << endl;
 		}
+		out << "==============" << endl;
 		return out;
 	}
 
 	V operator[](string key){
-		int val;
-		val = h(key);
-		if(val == 0){
-			throw runtime_error(key);
+		int pos = h(key);
+                TableEntry<V> entry(key);
+                int indice = table[pos].search(entry);
+
+		if(indice == -1){
+			throw runtime_error("Clave no encontrada");
 		}else{
-			return val;
+			return table[pos][indice].value;
 		}
+	}
+
+
+	//Heredados
+	
+	void insert(string key, V value) override{
+		int pos = h(key);
+		TableEntry<V> entry(key,value);
+
+		if(table[pos].search(entry) != -1){ // En caso de que ya exista
+			throw runtime_error("Clave ya existe en la lista");
+		}
+
+		table[pos].prepend(entry);
+		n++;
+	}
+
+	V search(string key) override {
+        	int pos = h(key);
+		TableEntry<V> entry(key);
+		int indice = table[pos].search(entry);
+					
+		if(indice != -1){
+			return table[pos][indice].value;
+		}else{
+			throw runtime_error("Clave no encontrada");
+		}
+        }
+
+	V remove(string key) override {
+  		int pos = h(key);
+		TableEntry<V> entry(key);
+		int indice = table[pos].search(entry);
+
+		if(indice != -1){
+			n--;
+			return table[pos].remove(indice).value;
+		}else{
+			throw runtime_error("Clave no encontrada");
+		}
+        }
+
+	int entries() const override{
+		return n;
 	}
 };
 
